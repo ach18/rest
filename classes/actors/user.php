@@ -6,12 +6,10 @@ class User
 {
     public $id;
     public $fio;
-    public $order;
 
-    function __construct($id, $fio, $order)
+    function __construct($id, $fio)
 	{
 		$this->id = $id;
 		$this->fio = $fio;
-		$this->order = $order;
 	}
 }

@@ -9,7 +9,7 @@ class UserGateway
 {
 
     private $pdo;
-    public $tableName = 'user';
+    public $tableName = '`user`';
 
     public function __construct(PDO $pdo)
     {
@@ -17,19 +17,18 @@ class UserGateway
     }
 
     
-    public function insert(User $obj) : bool
+    public function insert($obj) : bool
 	{
-        $stmt = $this->pdo->prepare("INSERT INTO $tableName (fio, order_id) VALUES(:fio, :order_id)");
+        $stmt = $this->pdo->prepare("INSERT INTO `user` (fio) VALUES (:fio)");
         $params = [
-            'fio' => $obj->fio,
-            'order_id' => $obj->orderId
+            'fio' => $obj['fio'],
         ];
 		return $stmt->execute($params);
     }
     
     public function getById($id)
 	{
-        $stmt = $this->pdo->prepare("SELECT * FROM $tableName WHERE id = :id");
+        $stmt = $this->pdo->prepare("SELECT * FROM `user` WHERE id = :id");
         $params = [
             'id' => $id
         ];
@@ -38,9 +37,20 @@ class UserGateway
         return isset($data['id']) ? $data : false;
     }
 
+    public function getFioById($id)
+	{
+        $stmt = $this->pdo->prepare("SELECT fio FROM `user` WHERE id = :id");
+        $params = [
+            'id' => $id
+        ];
+        $stmt->execute($params);
+        $data = $stmt->fetch();
+        return isset($data['fio']) ? $data : false;
+    }
+
     public function getAll()
 	{
-        $stmt = $this->pdo->prepare("SELECT * FROM $tableName");
+        $stmt = $this->pdo->prepare("SELECT * FROM `user`");
         $stmt->execute();
         $data = $stmt->fetch();
         return $data;
@@ -48,25 +58,33 @@ class UserGateway
 
     public function update($obj)
     {
-        $stmt = $this->pdo->prepare("UPDATE $tableName SET fio = :fio, order_id = :order_id WHERE id = :id");
+        $stmt = $this->pdo->prepare("UPDATE `user` SET fio = :fio WHERE id = :id");
         $params = [
-            'fio' => $obj->fio,
-            'order_id' => $obj->order_id,
-            'id' => $obj->id
+            'fio' => $obj['fio'],
+            'id' => $obj['id']
         ];
         $stmt->execute($params);
-        $result = $stmt->fetch();
-        return $result;
+        return $stmt;
     }
 
     public function deleteById($id)
     {
-        $stmt = $this->pdo->prepare("DELETE FROM $tableName WHERE id = :id");
+        $stmt = $this->pdo->prepare("DELETE FROM `user` WHERE id = :id");
         $params = [
-            'id' => $obj->id
+            'id' => $id
         ];
         $stmt->execute($params);
-        $result = $stmt->fetch();
-        return $result;
+        return $stmt;
+    }
+
+    public function getIdByFio($fio)
+    {
+        $stmt = $this->pdo->prepare("SELECT id FROM `user` WHERE fio = :fio");
+        $params = [
+            'fio' => $fio
+        ];
+        $stmt->execute($params);
+        $data = $stmt->fetchAll();
+        return array_pop($data);
     }
 }
